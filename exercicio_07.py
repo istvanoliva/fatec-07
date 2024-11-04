@@ -1,6 +1,6 @@
 import psycopg
 
-print(psycopg)
+print(psycopg)  
 
 class Usuario:
     def __init__(self, login, senha):
@@ -26,6 +26,23 @@ def existe(usuario):
             result = cursor.fetchone()
             # verifica se o resultado é diferente de None, o que indica que o usuário existe na base
             return result is not None
+        
+# método que insere usuário na base
+def inserir(usuario):
+    with psycopg.connect(
+        host="localhost",
+        port=5432,
+        dbname="20221_pessoal_db_login",
+        user="postgres",
+        password="postgres"
+    ) as conexao:
+        with conexao.cursor() as cursor:
+            cursor.execute(
+                'INSERT INTO tb_usuario (login, senha) VALUES (%s, %s)', 
+                (f'{usuario.login}', f'{usuario.senha}')
+            )
+            return cursor.rowcount >= 1
+
 
 # definição da função menu
 def menu():
@@ -48,6 +65,11 @@ def menu():
         elif op == 2:
             usuario = None
             print("Logoff realizado com sucesso")
+        elif op == 3:
+            login = input ("Digite login do novo usuário\n")
+            senha = input ("Digite senha do novo usuário\n")
+            novoUsuario = Usuario (login, senha)
+            print ("Inserção OK!!!" if inserir(novoUsuario) else "Inserção NOK")
         
         op = int(input(texto))
     
